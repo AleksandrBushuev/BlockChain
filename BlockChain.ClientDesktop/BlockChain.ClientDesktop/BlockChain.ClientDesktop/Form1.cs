@@ -1,8 +1,15 @@
-﻿using BlockChain.ClientDesktop.Keys;
+﻿using BlockChain.ClientDesktop.Extensions;
+using BlockChain.ClientDesktop.Helpers;
+using BlockChain.ClientDesktop.Keys;
 using BlockChain.Core;
+using BlockChain.Core.Clients;
+using BlockChain.Core.Common;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -18,8 +25,8 @@ namespace BlockChain.ClientDesktop
         public Form1()
         {
             InitializeComponent();           
-            _logger = new FormLogger(textBoxLogger);  
-            
+            _logger = new FormLogger(textBoxLogger);
+            txtAddress.Text = "https://localhost:44387/broadcast";
         }
 
         private async void btnAuth_Click(object sender, EventArgs e)
@@ -52,14 +59,38 @@ namespace BlockChain.ClientDesktop
                 var connected =  await _client.ConnectAsync();
 
                 if (connected)
+                {
+                    lbUser.Text = HashHelper.GetHashBits(user.Id);
                     _logger.LogDebug($"Подключение с сервером {txtAddress.Text} выполнено успешно");
-
-            }          
-           
-            
+                    await _client.PullAsync();
+                    _client.BlockchainChanged += BlockchainChanged;
+                }  
+            }                     
         }
 
 
+        private void BlockchainChanged()
+        {
+            var blockViews = _client.GetLocalBlockchain().ToBlockViews();
+            ShowBlockchain(gridDataChain, blockViews);
+        }
+
+
+        private void ShowBlockchain(DataGridView gridView, List<BlockView> blockViews)
+        {
+            gridView.Rows.Clear();
+            foreach (var block in blockViews)
+            {
+                gridView.Rows.Add(
+                    block.Number,
+                    block.TimeRecord.ToString("dd.MM.yy HH.mm"),
+                    block.UserId,
+                    block.Content,
+                    block.Hash,
+                    block.PrevHash
+                );
+            }
+        }
 
         private async Task<KeyInfoRSA> GetKeysAsync(string password)
         {
@@ -89,6 +120,18 @@ namespace BlockChain.ClientDesktop
                 return null;
             }        
         }
-        
+            
+
+        private async void btnAdd_Click(object sender, EventArgs e)
+        {
+            if (!_client.Connected)
+            {
+                _logger.LogDebug("Операция прервана! Отсутствует подключение с сервером");
+                return;
+            }
+
+            await _client.CommitAsync(textContent.Text);
+
+        }
     }
 }

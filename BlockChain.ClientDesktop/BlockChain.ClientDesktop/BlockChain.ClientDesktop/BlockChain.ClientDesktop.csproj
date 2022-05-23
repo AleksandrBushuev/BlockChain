@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <Reference Include="BlockChain.Core">
-      <HintPath>..\..\..\BlockChain.WebServer\BlockChain.Core\bin\Debug\netcoreapp3.1\BlockChain.Core.dll</HintPath>
+      <HintPath>..\..\..\BlockChain.Core\BlockChain.Core\bin\Debug\netcoreapp3.1\BlockChain.Core.dll</HintPath>
     </Reference>
   </ItemGroup>
 

@@ -60,11 +60,12 @@ namespace BlockChain.ClientDesktop.Keys
 
         public static KeyInfoRSA CreateKeys()
         {
-            var rsa = RSA.Create();
-
-            var keyInfo = new KeyInfoRSA();
-            keyInfo.SetParameters(rsa.ExportParameters(true));
-            return keyInfo;           
+            using (var rsa = new RSACryptoServiceProvider(2048))
+            {
+                var keyInfo = new KeyInfoRSA();
+                keyInfo.SetParameters(rsa.ExportParameters(true));
+                return keyInfo;
+            }                  
         }
 
         private static byte[] GetKeyPassword(string password)
