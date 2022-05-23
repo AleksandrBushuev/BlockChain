@@ -228,7 +228,7 @@ namespace BlockChain.ClientDesktop
             this.Controls.Add(this.textBoxLogger);
             this.Controls.Add(this.btnAuth);
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "Клиент";
             ((System.ComponentModel.ISupportInitialize)(this.gridDataChain)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
